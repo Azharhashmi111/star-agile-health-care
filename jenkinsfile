@@ -9,7 +9,7 @@ pipeline {
     stage('CheckOut') {
       steps {
         echo 'Checkout the source code from GitHub for karthik repo'
-        git branch: 'master', url: 'https://github.com/karthikpyati777/star-agile-health-care.git'
+        git branch: 'master', url: 'https://github.com/Azharhashmi111/star-agile-health-care.git'
             }
     }
     
