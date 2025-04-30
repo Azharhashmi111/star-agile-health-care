@@ -1,50 +1,56 @@
 pipeline {
-  agent any
+    agent any
 
-  tools {
-    maven 'Maven3'
-    }
-  
-  stages {
-    stage('CheckOut') {
-      steps {
-        echo 'Checkout the source code from GitHub for Azharhashmi repo'
-        git branch: 'master', url: 'https://github.com/Azharhashmi111/star-agile-health-care.git'
-            }
-    }
-    
-    stage('Package the Application') {
-      steps {
-        echo "Packaing the Application"
-        sh 'mvn clean package'
-            }
-    }
-    
-    stage('Docker Image Creation') {
-      steps {
-       sh 'docker build -t azharhashmi/medicure:5.0 .'
-            }
+    tools {
+        maven 'Maven3'
     }
 
-    stage('DockerLogin') {
-      steps {
-          withCredentials([usernamePassword(credentialsId: 'dockeruserid', passwordVariable: 'dockerhubpass', usernameVariable: 'dockerhubuser')] {
-          sh "docker login -u ${dockerhubuser} -p ${dockerhubpass}"
-               }
-             }
-           
-
-     stage('Push Image to DockerHub') {
-      steps {
-        sh 'docker push azharhashmi/medicure:5.0'
+    stages {
+        stage('CheckOut') {
+            steps {
+                echo 'Checkout the source code from GitHub for Azharhashmi repo'
+                git branch: 'master', url: 'https://github.com/Azharhashmi111/star-agile-health-care.git'
             }
-    }
-     stage('Deploy Application using Ansible') {
-         steps {
-    
+        }
 
-          ansiblePlaybook credentialsId: 'private-key', disableHostKeyChecking: true, installation: 'Ansible2', inventory: '/etc/ansible/hosts', playbook: 'ansible-playbook.yml', vaultTmpPath: ''
- }
-      }
-  }
+        stage('Package the Application') {
+            steps {
+                echo "Packaging the Application"
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Docker Image Creation') {
+            steps {
+                sh 'docker build -t azharhashmi/medicure:5.0 .'
+            }
+        }
+
+        stage('DockerLogin') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockeruserid', passwordVariable: 'dockerhubpass', usernameVariable: 'dockerhubuser')]) {
+                    sh "docker login -u ${dockerhubuser} -p ${dockerhubpass}"
+                }
+            }
+        }
+
+        stage('Push Image to DockerHub') {
+            steps {
+                sh 'docker push azharhashmi/medicure:5.0'
+            }
+        }
+
+        stage('Deploy Application using Ansible') {
+            steps {
+                ansiblePlaybook(
+                    credentialsId: 'private-key',
+                    disableHostKeyChecking: true,
+                    installation: 'Ansible2',
+                    inventory: '/etc/ansible/hosts',
+                    playbook: 'ansible-playbook.yml',
+                    vaultTmpPath: ''
+                )
+            }
+        }
+    }
 }
