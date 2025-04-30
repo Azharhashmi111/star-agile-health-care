@@ -8,7 +8,7 @@ pipeline {
   stages {
     stage('CheckOut') {
       steps {
-        echo 'Checkout the source code from GitHub for karthik repo'
+        echo 'Checkout the source code from GitHub for Azharhashmi repo'
         git branch: 'master', url: 'https://github.com/Azharhashmi111/star-agile-health-care.git'
             }
     }
@@ -32,7 +32,7 @@ pipeline {
           sh "docker login -u ${dockerhubuser} -p ${dockerhubpass}"
                }
              }
-           }
+           
 
      stage('Push Image to DockerHub') {
       steps {
